@@ -16,20 +16,28 @@ router.use(cors());
 router.post('/', async (req, res, next) => {
   const { encodedpic } = req.body;
 
-  // const genModel = await clarifai.models.initModel({
-  //   id: Clarifai.GENERAL_MODEL,
-  //   version: GENERAL_MODEL
-  // });
-  // const result = await genModel.predict(
-  //   'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/2ChocolateChipCookies.jpg/1200px-2ChocolateChipCookies.jpg'
-  // );
+  try {
+    const result = await clarifai.models.predict(
+      {
+        id: Clarifai.GENERAL_MODEL,
+        version: GENERAL_MODEL
+      },
+      {
+        base64: encodedpic
+      }
+    );
 
-  // const relations = result.outputs[0].data.concepts.map(concept => {
-  //   const { name, value } = concept;
-  //   return { association: name, confidence: value };
-  // });
-  return res.json({ encodedpic });
-  // return res.json({ relations });
+    // clean up data from clarifai into nice output
+    const relations = result.outputs[0].data.concepts.map(concept => {
+      const { name, value } = concept;
+      return { association: name, confidence: value };
+    });
+
+    // return clarifai relation data back to user
+    return res.json({ relations });
+  } catch (error) {
+    return res.next(error);
+  }
 });
 
 // exports router for app.js use
