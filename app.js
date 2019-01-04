@@ -10,6 +10,7 @@ if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'production') {
   app.use(morgan('tiny'));
 }
 
+// allow cross origin
 app.use(function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header(
@@ -19,8 +20,10 @@ app.use(function(req, res, next) {
   next();
 });
 
+// allow large payload (iphone picture)
 const bodyParser = require('body-parser');
-app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.json({ limit: '10mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
 // routes
 const imagesRoutes = require('./routes/images');
