@@ -3,6 +3,9 @@ const Clarifai = require('clarifai');
 const express = require('express');
 const router = new express.Router();
 
+// import helper
+const validHTTPMethods = require('../helpers/validHTTPMethods');
+
 const clarifai = new Clarifai.App({ apiKey: CLARIFAI_API_KEY });
 const cors = require('cors');
 
@@ -42,14 +45,8 @@ const COLOR_MODEL = 'eeed0b6733a644cea07cf4c60f87ebb7';
 // };
 router.use(cors());
 
-router.use(function(req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept'
-  );
-  next();
-});
+// middleware - restrict http methods on '/stories' route
+router.use('/', validHTTPMethods(['GET', 'POST']));
 
 /** default get on route /images */
 router.get('/', async (req, res, next) => {

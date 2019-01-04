@@ -1,5 +1,7 @@
 const express = require('express');
 const app = express();
+const helmet = require('helmet');
+const validHTTPMethods = require('./helpers/validHTTPMethods');
 
 // don't provide http logging during automated tests
 if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'production') {
@@ -14,6 +16,18 @@ const imagesRoutes = require('./routes/images');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// enable header protection using helmet
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"]
+      }
+    },
+    referrerPolicy: { policy: 'no-referrer' }
+  })
+);
+
 // routing control
 app.use('/images', imagesRoutes);
 
@@ -23,6 +37,9 @@ app.use((req, res, next) => {
   error.status = 404;
   return next(error);
 });
+
+// restrict http methods on any undefined routes
+app.use(validHTTPMethods(['GET']));
 
 /** error handler */
 app.use((err, req, res, next) => {
