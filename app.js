@@ -1,17 +1,18 @@
 const express = require('express');
 const app = express();
-// uncomment below to use morgan for basic logging
-const morgan = require('morgan');
+
+// don't provide http logging during automated tests
+if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'production') {
+  // middleware for logging HTTP requests to console
+  const morgan = require('morgan');
+  app.use(morgan('tiny'));
+}
+// routes
+const imagesRoutes = require('./routes/images');
 
 // allow express to parse JSON
 app.use(express.json());
-// Parse request bodies for JSON
 app.use(express.urlencoded({ extended: true }));
-
-// log items to console using morgan - optional enable
-app.use(morgan('tiny'));
-
-const imagesRoutes = require('./routes/images');
 
 // routing control
 app.use('/images', imagesRoutes);

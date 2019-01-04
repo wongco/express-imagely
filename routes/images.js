@@ -30,10 +30,35 @@ const COLOR_MODEL = 'eeed0b6733a644cea07cf4c60f87ebb7';
 // PORTRAIT_QUALITY: 'de9bd05cfdbf4534af151beb2a5d0953'
 
 // allow CORS on all routes in this router page
+// router.options('*', cors());
+
+// var whitelist = ['http://192.168.3.80:3001'];
+// var corsOptions = {
+//   origin: function(origin, callback) {
+//     var originIsWhitelisted = whitelist.indexOf(origin) !== -1;
+//     callback(null, originIsWhitelisted);
+//   },
+//   credentials: true
+// };
 router.use(cors());
+
+router.use(function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept'
+  );
+  next();
+});
 
 /** default get on route /images */
 router.get('/', async (req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Origin', req.headers.origin);
+  } else {
+    res.header('Access-Control-Allow-Origin', '*');
+  }
+
   const { encodedpic } = req.body;
 
   try {
@@ -48,6 +73,11 @@ router.get('/', async (req, res, next) => {
 
 /** default get on route /images */
 router.post('/', async (req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Origin', req.headers.origin);
+  } else {
+    res.header('Access-Control-Allow-Origin', '*');
+  }
   const { encodedpic } = req.body;
 
   try {
