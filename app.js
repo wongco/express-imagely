@@ -9,6 +9,19 @@ if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'production') {
   const morgan = require('morgan');
   app.use(morgan('tiny'));
 }
+
+app.use(function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept'
+  );
+  next();
+});
+
+const bodyParser = require('body-parser');
+app.use(bodyParser.json({ limit: '50mb' }));
+
 // routes
 const imagesRoutes = require('./routes/images');
 
@@ -31,15 +44,15 @@ app.use(
 // routing control
 app.use('/images', imagesRoutes);
 
+// restrict http methods on any undefined routes
+app.use(validHTTPMethods(['GET']));
+
 /** 404 catch all */
 app.use((req, res, next) => {
   const error = new Error('Resource could not be found.');
   error.status = 404;
   return next(error);
 });
-
-// restrict http methods on any undefined routes
-app.use(validHTTPMethods(['GET']));
 
 /** error handler */
 app.use((err, req, res, next) => {

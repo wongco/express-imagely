@@ -1,13 +1,14 @@
-const { CLARIFAI_API_KEY } = require('../config');
 const Clarifai = require('clarifai');
 const express = require('express');
 const router = new express.Router();
+const cors = require('cors');
 
 // import helper
 const validHTTPMethods = require('../helpers/validHTTPMethods');
 
+// import config info
+const { CLARIFAI_API_KEY } = require('../config');
 const clarifai = new Clarifai.App({ apiKey: CLARIFAI_API_KEY });
-const cors = require('cors');
 
 const GENERAL_MODEL = 'aa7f35c01e0642fda5cf400f543e7c40';
 const COLOR_MODEL = 'eeed0b6733a644cea07cf4c60f87ebb7';
@@ -32,21 +33,10 @@ const COLOR_MODEL = 'eeed0b6733a644cea07cf4c60f87ebb7';
 // LANDSCAPE_QUALITY: 'bec14810deb94c40a05f1f0eb3c91403',
 // PORTRAIT_QUALITY: 'de9bd05cfdbf4534af151beb2a5d0953'
 
-// allow CORS on all routes in this router page
-// router.options('*', cors());
-
-// var whitelist = ['http://192.168.3.80:3001'];
-// var corsOptions = {
-//   origin: function(origin, callback) {
-//     var originIsWhitelisted = whitelist.indexOf(origin) !== -1;
-//     callback(null, originIsWhitelisted);
-//   },
-//   credentials: true
-// };
 router.use(cors());
 
 // middleware - restrict http methods on '/stories' route
-router.use('/', validHTTPMethods(['GET', 'POST']));
+router.all('/', validHTTPMethods(['GET', 'POST']));
 
 /** default get on route /images */
 router.get('/', async (req, res, next) => {
